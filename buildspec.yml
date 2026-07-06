@@ -1,10 +1,45 @@
 version: 0.2
 
+env:
+  variables:
+    APP_NAME: "MyApplication"
+
 phases:
+
+  install:
+    commands:
+      - echo "===== INSTALL PHASE ====="
+      - echo "Installing dependencies..."
+      - echo "Build started for $APP_NAME"
+
+  pre_build:
+    commands:
+      - echo "===== PRE-BUILD PHASE ====="
+      - echo "Creating sample file..."
+      - echo "AWS Elastic Beanstalk Service" > test.txt
+      - cat test.txt
+
   build:
     commands:
-      - echo "Build successful"
+      - echo "===== BUILD PHASE ====="
+      - |
+        if grep -q "Elastic" test.txt; then
+          echo "SUCCESS: 'Elastic' found."
+        else
+          echo "FAILURE: 'Elastic' not found."
+          exit 1
+        fi
+
+  post_build:
+    commands:
+      - echo "===== POST-BUILD PHASE ====="
+      - echo "Build completed successfully."
+      - date
 
 artifacts:
   files:
-    - '**/*'
+    - test.txt
+
+cache:
+  paths:
+    - '/root/.m2/**/*'
